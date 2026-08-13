@@ -226,6 +226,37 @@
       color: var(--text-dark);
     }
 
+    .product-description {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .product-sizes {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .sizes-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-right: 2px;
+    }
+
+    .size-tag {
+      border: 1px solid var(--border-color);
+      padding: 2px 7px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      background-color: var(--surface-color);
+    }
+
     .btn-whatsapp {
       margin-top: 8px;
       background-color: var(--text-dark);
@@ -383,6 +414,30 @@
     let currentPage = 1;
     let currentFilteredProducts = [];
 
+    // CONFIGURACIÓN POR DEFECTO SEGÚN CATEGORÍA
+    // (se usa si el producto no trae su propia "description" o "sizes")
+    // Puedes cambiar los textos o las tallas de cada categoría aquí abajo,
+    // o agregar "description" / "sizes" directamente a un producto puntual
+    // en la lista de abajo para sobreescribir el valor por defecto.
+    const CATEGORY_DEFAULTS = {
+      camisetas: {
+        description: "Camiseta de algodón premium, corte moderno y acabados de alta calidad.",
+        sizes: ["S", "M", "L", "XL"]
+      },
+      camisas: {
+        description: "Camisa slim fit en tela premium, ideal para uso formal o casual.",
+        sizes: ["S", "M", "L", "XL"]
+      },
+      perfumes: {
+        description: "Fragancia original de larga duración.",
+        sizes: []
+      },
+      deportivo: {
+        description: "Prenda deportiva cómoda y resistente, ideal para entrenar o uso diario.",
+        sizes: ["S", "M", "L", "XL"]
+      }
+    };
+
     // BASE DE DATOS DE PRODUCTOS
     const products = [
       {
@@ -436,6 +491,7 @@
         price: "$119.900",
         category: "camisetas",
         badge: "Nuevo",
+        sizes:["L","XL"],
         image: "https://punto1.co/cdn/shop/files/P0004151.jpg?v=1773252362&width=1445",
         image2: "https://punto1.co/cdn/shop/files/P0004150.jpg?v=1773252362&width=1445"
       },
@@ -472,6 +528,7 @@
         price: "$119.900",
         category: "camisetas",
         badge: "Nuevo",
+        sizes:["S","M","L"],
         image: "https://punto1.co/cdn/shop/files/magnific_inviierte-los-colores-la-_3GjhuH6REY.png?v=1781101911&width=1445",
         image2: "https://punto1.co/cdn/shop/files/6d17bf16f5d00a94f1f53a3746c7412f.jpg?v=1781099678&width=1445"
       },
@@ -481,6 +538,7 @@
         price: "$115.000",
         category: "camisetas",
         badge: "Nuevo",
+        sizes:["M"],
         image: "https://punto1.co/cdn/shop/files/921036roja.png?v=1780083251&width=1445",
         image2: "https://punto1.co/cdn/shop/files/ROJA.jpg?v=1780083251&width=1445"
       },
@@ -687,6 +745,20 @@
           ? `<img src="${prod.image2}" alt="${prod.title} - Vista Secundaria" class="image-hover" loading="lazy">` 
           : '';
 
+        // Usa la descripción/tallas propias del producto si existen,
+        // si no, cae en el valor por defecto de su categoría
+        const catDefaults = CATEGORY_DEFAULTS[prod.category] || { description: '', sizes: [] };
+        const description = prod.description || catDefaults.description;
+        const sizes = prod.sizes || catDefaults.sizes;
+
+        const descriptionHtml = description
+          ? `<p class="product-description">${description}</p>`
+          : '';
+
+        const sizesHtml = sizes && sizes.length
+          ? `<div class="product-sizes"><span class="sizes-label">Tallas:</span>${sizes.map(s => `<span class="size-tag">${s}</span>`).join('')}</div>`
+          : '';
+
         const cardHtml = `
           <div class="product-card">
             <div class="image-wrapper">
@@ -697,6 +769,8 @@
             <div class="product-info">
               <h3 class="product-title">${prod.title}</h3>
               <div class="product-price">${prod.price}</div>
+              ${descriptionHtml}
+              ${sizesHtml}
               <a href="${waUrl}" target="_blank" class="btn-whatsapp">
                 Pedir por WhatsApp
               </a>
